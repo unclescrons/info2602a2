@@ -1,8 +1,8 @@
 {% extends "layout.html" %}
 
-{% block title %}{% endblock %}
+{% block title %}Home{% endblock %}
 
-{% block page %}{% endblock %}
+{% block page %}Home{% endblock %}
 
 {% block link%}
 <ul id="nav-mobile" class="right">
@@ -25,7 +25,9 @@
 {% block content %}
 <div class="row">
     <div class="col m3 list-container collection" style="max-height: 88vh;">
-  
+        {% for one in pokes %}
+            <a id="pokes-{{one.id}}" class="collection-item {{'active' if poke.id == one.id}}" href="/app/{{one.id}}">{{ one.name }}</a>
+        {% endfor %}
     </div>
     
     <div class="col m3">

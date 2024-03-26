@@ -117,19 +117,39 @@ def logout_action():
 
 # Page Routes (To Update)
 
+def login_user1(username, password):
+  user = User.query.filter_by(username=username).first()
+  if user and user.check_password(password):
+    token = create_access_token(identity=user)
+    return token
+  return None
+
 @app.route("/app", methods=['GET'])
 @app.route("/app/<int:pokemon_id>", methods=['GET'])
 @jwt_required()
 def home_page(pokemon_id=1):
     # update pass relevant data to template
-    return render_template("home.html")
+    pokes = Pokemon.query.all()
+    poke = Pokemon.query.filter_by(id=pokemon_id)
+    captured = UserPokemon.query.filter_by(user_id=current_user.id).all()
+    return render_template("home.html", pokes=pokes, poke=poke, captured=captured)
 
 # Action Routes (To Update)
 
-@app.route("/login", methods=['POST'])
-def login_action():
-  # implement login
-  return "Login Action"
+@app.route('/login', methods=['POST'])
+def login_user():
+  data = request.form
+  token = login_user1(data['username'], data['password'])
+  print(token)
+  response = None
+  if token:
+    flash('Logged in successfully.')  # send message to next page
+    response = redirect(url_for('home_page'))  # redirect to main page if login successful
+    set_access_cookies(response, token)
+  else:
+    flash('Invalid username or password')  # send message to next page
+    response = redirect(url_for('login_user'))
+  return response
 
 @app.route("/pokemon/<int:pokemon_id>", methods=['POST'])
 @jwt_required()
